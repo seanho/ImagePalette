@@ -9,12 +9,16 @@
 import Foundation
 import UIKit
 
+public typealias PaletteFilter = (r: Int, g: Int, b: Int, a: Int) -> Bool
+
 public final class PaletteConfiguration {
 	private static let DEFAULT_CALCULATE_NUMBER_COLORS = 16
 	private static let DEFAULT_RESIZE_BITMAP_MAX_DIMENSION = CGFloat(192)
 
 	private let bitmap: UIImage?
 	private let swatches: [PaletteSwatch]?
+
+	public var filters = [PaletteFilter]()
 
 	/**
 	The maximum number of colors to use in the quantization step when using an image
@@ -31,7 +35,7 @@ public final class PaletteConfiguration {
 	dimension is greater than the value specified, then the image will be resized so
 	that it's largest dimension matches maxDimension. If the bitmap is smaller or
 	equal, the original is used as-is.
-	
+
 	This value has a large effect on the processing time. The larger the resized image is,
 	the greater time it will take to generate the palette. The smaller the image is, the
 	more detail is lost in the resulting image and thus less precision for color selection.
@@ -71,7 +75,7 @@ public final class PaletteConfiguration {
 			// First we'll scale down the bitmap so it's largest dimension is as specified
 			if let scaledBitmap = image.scaleDown(self.resizeMaxDimension) {
 				// Now generate a quantizer from the Bitmap
-				let quantizer = ColorCutQuantizer.fromImage(scaledBitmap, maxColors: self.maxColors);
+				let quantizer = ColorCutQuantizer.fromImage(scaledBitmap, maxColors: self.maxColors, filters: self.filters);
 				swatches = quantizer.quantizedColors
 			} else {
 				fatalError("Unable to scale down image.")

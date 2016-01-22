@@ -33,8 +33,8 @@ internal final class ColorCutQuantizer {
 	:param: image Image to extract the pixel data from
 	:param: maxColors The maximum number of colors that should be in the result palette.
 	*/
-	internal static func fromImage(image: UIImage, maxColors: Int) -> ColorCutQuantizer {
-		let pixels = image.pixels
+	internal static func fromImage(image: UIImage, maxColors: Int, filters: [PaletteFilter]) -> ColorCutQuantizer {
+		let pixels = image.pixels(filters)
 		return ColorCutQuantizer(colorHistogram: ColorHistogram(pixels: pixels), maxColors: maxColors)
 	}
 
@@ -124,7 +124,7 @@ internal final class ColorCutQuantizer {
 
 		for vbox in vboxes {
 			let color = vbox.averageColor
-			
+
 			if (!self.dynamicType.shouldIgnoreColor(color)) {
 				// As we're averaging a color box, we can still get colors which we do not want, so
 				// we check again here
@@ -267,7 +267,7 @@ private class Vbox: Hashable {
 
 	/**
 	Split this color box at the mid-point along it's longest dimension
-	
+
 	:return: the new ColorBox
 	*/
 	func splitBox() -> Vbox {

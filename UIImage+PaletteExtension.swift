@@ -37,7 +37,7 @@ extension UIImage {
 		return scaledImage
 	}
 
-	internal var pixels: Array<Int> {
+	internal func pixels(filters: [PaletteFilter]) -> Array<Int> {
 		let image = self.CGImage!
 
 		let pixelsWide = CGImageGetWidth(image)
@@ -66,7 +66,9 @@ extension UIImage {
 						let green = Int(data[pixelInfo + 2])
 						let blue = Int(data[pixelInfo + 3])
 
-						pixels.append(HexColor.fromARGB(alpha, red: red, green: green, blue: blue))
+            if filters.filter({ $0(r: red, g: green, b: blue, a: alpha) }).count == filters.count {
+							pixels.append(HexColor.fromARGB(alpha, red: red, green: green, blue: blue))
+            }
 					}
 				}
 
@@ -77,7 +79,5 @@ extension UIImage {
 		} else {
 			fatalError("Unable to allocate color space")
 		}
-
 	}
-
 }
